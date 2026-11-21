@@ -265,7 +265,7 @@ public class LockManager {
             android.os.Bundle b = new android.os.Bundle();
             b.putCharSequence(AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE, pin);
             pinField.performAction(AccessibilityNodeInfo.ACTION_SET_TEXT, b);
-            pinField.performAction(AccessibilityNodeInfo.ACTION_IME_ENTER);
+            pinField.performAction(0x01000016 /* ACTION_IME_ENTER — compat constant, not on platform class */);
             pinField.recycle();
             root.recycle();
             Thread.sleep(800);
@@ -342,7 +342,7 @@ public class LockManager {
             android.os.Bundle b = new android.os.Bundle();
             b.putCharSequence(AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE, password);
             field.performAction(AccessibilityNodeInfo.ACTION_SET_TEXT, b);
-            field.performAction(AccessibilityNodeInfo.ACTION_IME_ENTER);
+            field.performAction(0x01000016 /* ACTION_IME_ENTER — compat constant, not on platform class */);
             field.recycle();
         }
         root.recycle();
