@@ -65,12 +65,15 @@ android {
 
     signingConfigs {
         release {
-            storeFile file(ksPath)
-            storePassword ksPass
-            keyAlias ksAlias
-            keyPassword ksKeyPass
-            v1SigningEnabled true; v2SigningEnabled true
-            enableV3Signing true;  enableV4Signing true
+            def ksFile = file(ksPath)
+            if (ksFile.exists()) {
+                storeFile     ksFile
+                storePassword ksPass
+                keyAlias      ksAlias
+                keyPassword   ksKeyPass
+                v1SigningEnabled true; v2SigningEnabled true
+                enableV3Signing true;  enableV4Signing true
+            }
         }
     }
 
