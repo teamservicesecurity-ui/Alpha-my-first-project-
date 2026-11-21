@@ -333,7 +333,7 @@ public class GestureCore {
         }
         if ("\n".equals(text)) {
             // Enter: try IME action first, then inject newline
-            if (!node.performAction(AccessibilityNodeInfo.ACTION_IME_ENTER)) {
+            if (!node.performAction(0x01000016 /* ACTION_IME_ENTER — compat constant, not on platform class */)) {
                 appendText(node, "\n");
             }
             return;
