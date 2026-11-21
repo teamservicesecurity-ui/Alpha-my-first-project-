@@ -1,0 +1,74 @@
+# ── Android build outputs ────────────────────────────────────────────────────
+*.apk
+*.aab
+*.ap_
+*.dex
+*.class
+
+android-alpha/.gradle/
+android-alpha/build/
+android-alpha/app/build/
+android-alpha/local.properties
+android-alpha/**/*.iml
+android-alpha/.idea/
+android-alpha/captures/
+android-alpha/app/release/
+
+# ── Keystore — NEVER commit these ────────────────────────────────────────────
+*.jks
+*.keystore
+*.p12
+*.pfx
+
+# ── Gradle wrapper jar — Kovak adds manually ─────────────────────────────────
+gradle-wrapper.jar
+android-alpha/gradle/wrapper/gradle-wrapper.jar
+
+# ── NDK / CMake build outputs ────────────────────────────────────────────────
+android-alpha/.cxx/
+android-alpha/app/.cxx/
+
+# ── Node / server ────────────────────────────────────────────────────────────
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm
+
+# ── Database (generated at runtime) ──────────────────────────────────────────
+alpha.db
+alpha.db-shm
+alpha.db-wal
+
+# ── OS / editor ──────────────────────────────────────────────────────────────
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+*.iml
+
+# ── Secrets / env ────────────────────────────────────────────────────────────
+.env
+.env.*
+secrets.properties
+local.properties
+
+# ── Logs ─────────────────────────────────────────────────────────────────────
+logs/
+*.log
+
+# ── Temp / build script artefacts ────────────────────────────────────────────
+*.tmp
+*.bak
+*.orig
+dist/
+out/

