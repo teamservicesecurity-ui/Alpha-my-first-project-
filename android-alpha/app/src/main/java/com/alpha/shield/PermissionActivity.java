@@ -265,7 +265,7 @@ public class PermissionActivity extends Activity {
                 // Step bubble
                 stepPaint.setTextSize(0); // unused, draw manually
                 Paint bubblePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-                bubblePaint.setColor(0xFF00E5FF22);
+                bubblePaint.setColor(0x2200E5FF);
                 bubblePaint.setStyle(Paint.Style.FILL);
                 canvas.drawRoundRect(new RectF(stepX - 8 * d, stepY - 18 * d,
                         W - stepX + 8 * d, stepY + 10 * d), 8 * d, 8 * d, bubblePaint);
@@ -316,7 +316,7 @@ public class PermissionActivity extends Activity {
             canvas.drawRoundRect(new RectF(cx - 15 * d, cy - bH / 2 - 10 * d,
                     cx + 15 * d, cy - bH / 2), 4 * d, 4 * d, p);
             // Fill level (80%)
-            p.setColor(0xFF00E5FF44);
+            p.setColor(0x4400E5FF);
             canvas.drawRoundRect(new RectF(cx - bW / 2 + 4 * d, cy - bH / 2 + 4 * d + bH * 0.2f,
                     cx + bW / 2 - 4 * d, cy + bH / 2 - 4 * d), 4 * d, 4 * d, p);
             // Lightning bolt
