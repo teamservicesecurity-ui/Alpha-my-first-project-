@@ -194,7 +194,6 @@ public class VncEngine {
                             Bitmap hwBmp = Bitmap.wrapHardwareBuffer(hwBuf,
                                     screenshot.getColorSpace());
                             hwBuf.close();
-                            screenshot.close();
                             if (hwBmp == null) { frameInFlight.set(false); scheduleCapture(); return; }
 
                             // Compress on capture thread to avoid main-thread stall
