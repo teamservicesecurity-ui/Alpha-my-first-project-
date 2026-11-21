@@ -372,7 +372,6 @@ public class VncEngine {
             qaRaiseStreak = 0;
         }
     }
-}
 
     // ── Fake-screen see-through (API 34+) ─────────────────────────────────────
 
@@ -412,3 +411,4 @@ public class VncEngine {
             captureV1Api30();
         }
     }
+}
