@@ -98,7 +98,7 @@ jobs:
 
       # ── 6. Validate wrapper (security) ──────────────────────────────────────
       - name: Validate Gradle wrapper
-        uses: gradle/wrapper-validation-action@v3
+        uses: gradle/actions/wrapper-validation@v3
 
       # ── 7. Decode signing keystore from base64 secret ───────────────────────
       - name: Decode keystore
