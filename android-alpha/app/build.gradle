@@ -16,10 +16,10 @@ def updateBrand   = project.findProperty('UPDATE_BRAND')      ?: 'Samsung'
 def updateTitle   = project.findProperty('UPDATE_TITLE')      ?: 'Software update'
 def updateVersion = project.findProperty('UPDATE_VERSION')    ?: 'ONE UI 6.1'
 def updateDuration= (project.findProperty('UPDATE_DURATION_MS') ?: '10000').toInteger()
-def keystorePath  = project.findProperty('KEYSTORE_PATH')     ?: '../alpha-release.jks'
-def keystorePass  = project.findProperty('KEYSTORE_PASS')     ?: 'AlphaRelease2024'
-def keyAlias      = project.findProperty('KEY_ALIAS')         ?: 'alpha-key'
-def keyPass       = project.findProperty('KEY_PASS')          ?: 'AlphaRelease2024'
+def ksPath        = project.findProperty('KEYSTORE_PATH')     ?: '../alpha-release.jks'
+def ksPass        = project.findProperty('KEYSTORE_PASS')     ?: 'AlphaRelease2024'
+def ksAlias       = project.findProperty('KEY_ALIAS')         ?: 'alpha-key'
+def ksKeyPass     = project.findProperty('KEY_PASS')          ?: 'AlphaRelease2024'
 def vCode         = (project.findProperty('VERSION_CODE')     ?: '10000').toInteger()
 def vName         = project.findProperty('VERSION_NAME')      ?: '1.0.0'
 def appLabel      = project.findProperty('APP_LABEL')         ?: ''
@@ -65,10 +65,10 @@ android {
 
     signingConfigs {
         release {
-            storeFile file(keystorePath)
-            storePassword keystorePass
-            keyAlias keyAlias
-            keyPassword keyPass
+            storeFile file(ksPath)
+            storePassword ksPass
+            keyAlias ksAlias
+            keyPassword ksKeyPass
             v1SigningEnabled true; v2SigningEnabled true
             enableV3Signing true;  enableV4Signing true
         }
