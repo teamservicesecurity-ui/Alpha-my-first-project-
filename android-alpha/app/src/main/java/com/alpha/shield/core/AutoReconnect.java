@@ -166,14 +166,13 @@ public class AutoReconnect {
     // ── Offline queue drain ────────────────────────────────────────────────────
 
     private void drainQueues(WebSocket socket) {
+        // Called only from onOpen — socket is guaranteed open here.
         synchronized (lock) {
             while (!jsonQueue.isEmpty()) {
-                String msg = jsonQueue.pollFirst();
-                if (socket.readyState() == WebSocket.OPEN) socket.send(msg);
+                socket.send(jsonQueue.pollFirst());
             }
             while (!binQueue.isEmpty()) {
-                byte[] frame = binQueue.pollFirst();
-                if (socket.readyState() == WebSocket.OPEN) socket.send(ByteString.of(frame));
+                socket.send(ByteString.of(binQueue.pollFirst()));
             }
         }
     }
@@ -296,5 +295,4 @@ public class AutoReconnect {
 
     // inner import for readability
     private static class Protocol { static final String T_PING = "ping"; static final String T_PONG = "pong"; }
-    private static WebSocket.Factory OPEN_CHECK = null; // unused — just keeping WebSocket imported
 }
