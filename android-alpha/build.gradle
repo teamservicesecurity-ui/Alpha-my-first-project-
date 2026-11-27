@@ -8,12 +8,7 @@ buildscript {
     }
 }
 
-allprojects {
-    repositories {
-        google()
-        mavenCentral()
-    }
-}
+// NO allprojects { repositories {} } block — settings.gradle owns repos now
 
 task clean(type: Delete) {
     delete rootProject.buildDir
