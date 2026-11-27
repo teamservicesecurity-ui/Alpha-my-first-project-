@@ -92,13 +92,7 @@ public class FileManager {
         ROOT_PATHS.put("documents",  base + "/Documents");
         ROOT_PATHS.put("music",      base + "/Music");
         ROOT_PATHS.put("videos",     base + "/Movies");
-        // Add external SD if available
-        String[] extDirs = new String[0];
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            File[] ext = android.app.Application.getProcessName() != null
-                    ? new File[]{} : new File[]{};
-            // Will be populated via context in commander
-        }
+        // External SD populated at runtime via FileManager.addExternalStorage(context)
     }
 
     // ── LIST ─────────────────────────────────────────────────────────────────
